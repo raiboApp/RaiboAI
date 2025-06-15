@@ -36,3 +36,6 @@ To integrate:
 - `app.py` — Main service entry point and API definitions
 - `clip_utils.py` — Utility functions for AI processing(feature embeddings functions).
 - `requirements.txt` — Python dependencies
+
+**Note:**  
+For security reasons, the `.env` file is not included in this repository. You must create your own `.env` file based on the required variables in the code or documentation.
