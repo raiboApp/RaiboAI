@@ -1,42 +1,40 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile, Form
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import clip_utils
 
 app = FastAPI()
 
-class TextQuery(BaseModel):
-    text_query: str
-
-class ImageQuery(BaseModel):
-    image_url: str
-
-class ImageTextQuery(BaseModel):
-    image_url: str
-    text_query: str
-
 @app.post("/embed-text")
-def search_text(query: TextQuery):
-    text_features = clip_utils.extract_clip_text_features(query.text_query)
-    if text_features is None:
-        return {"error": "Failed to extract text features."}
-    return {"text_features": text_features}
+def search_text(text_query: str = Form(...)):
+    text_embedding = clip_utils.extract_clip_text_features(text_query)
+    return {"text_embedding": text_embedding}
 
 @app.post("/embed-image")
-def search_image(query: ImageQuery):
-    image_features = clip_utils.extract_clip_image_features(query.image_url)
-    if image_features is None:
-        return {"error": "Failed to extract image features."}
-    return {"image_features": image_features}
+async def search_image(image: UploadFile = File(...)):
+    try:
+        image_bytes = await image.read()
+        image_embedding = clip_utils.extract_clip_image_features(image_bytes)
+        return {"image_embedding": image_embedding}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
 
 @app.post("/embed-image-text")
-def search_image_text(query: ImageTextQuery):
-    print("hello")
-    combined_features = clip_utils.extract_image_and_text_features(
-        query.image_url, query.text_query
-    )
-    if combined_features is None:
-        return {"error": "Failed to extract combined features."}
-    return {"combined_features": combined_features}
+async def search_image_text(image: UploadFile = File(...), text_query: str = Form(...)):
+    try:
+        image_bytes = await image.read()
+        combined_embedding = clip_utils.extract_image_and_text_features(
+            image_bytes, text_query
+        )
+        return {"combined_embedding": combined_embedding}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
 
 if __name__ == "__main__":
     import uvicorn
