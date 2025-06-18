@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import clip_utils
+import os
 
 app = FastAPI()
 
@@ -38,5 +39,6 @@ async def search_image_text(image: UploadFile = File(...), text_query: str = For
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=5000, reload=True)
+    port = int(os.getenv("PORT", 8080))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)
 
