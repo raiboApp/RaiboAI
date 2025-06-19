@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import clip_utils
 import os
+import requests
 
 app = FastAPI()
 
@@ -12,9 +13,19 @@ def search_text(text_query: str = Form(...)):
     return {"text_embedding": text_embedding}
 
 @app.post("/embed-image")
-async def search_image(image: UploadFile = File(...)):
+async def search_image(image: UploadFile = File(None), image_url: str = Form(None)):
     try:
-        image_bytes = await image.read()
+        if image:
+            image_bytes = await image.read()
+        elif image_url:
+            response = requests.get(image_url)
+            response.raise_for_status()
+            image_bytes = response.content
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Either an image file or an image URL must be provided."}
+            )
         image_embedding = clip_utils.extract_clip_image_features(image_bytes)
         return {"image_embedding": image_embedding}
     except Exception as e:
@@ -24,9 +35,19 @@ async def search_image(image: UploadFile = File(...)):
         )
 
 @app.post("/embed-image-text")
-async def search_image_text(image: UploadFile = File(...), text_query: str = Form(...)):
+async def search_image_text(image: UploadFile = File(None), image_url: str = Form(None), text_query: str = Form(...)):
     try:
-        image_bytes = await image.read()
+        if image:
+            image_bytes = await image.read()
+        elif image_url:
+            response = requests.get(image_url)
+            response.raise_for_status()
+            image_bytes = response.content
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Either an image file or an image URL must be provided."}
+            )
         combined_embedding = clip_utils.extract_image_and_text_features(
             image_bytes, text_query
         )
