@@ -1,8 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 import clip_utils
-import os
 import requests
 
 app = FastAPI()
