@@ -37,8 +37,8 @@ async def search_image_text(image: UploadFile = File(...), text_query: str = For
             content={"error": str(e)}
         )
 
-# if __name__ == "__main__":
-#     import uvicorn
-#     port = int(os.getenv("PORT", 8080))
-#     uvicorn.run("app:app", host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+#    import uvicorn
+#    port = int(os.getenv("PORT", 8080))
+#    uvicorn.run("app:app", host="0.0.0.0", port=port)
 

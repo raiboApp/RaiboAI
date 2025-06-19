@@ -28,6 +28,6 @@ jobs:
       run: |
         gcloud run deploy raibo-ai \
           --source . \
-          --region asia-south1 \
+          --region asia-southeast1 \
           --platform managed \
-          --allow-unauthenticated \
+          --allow-unauthenticated
